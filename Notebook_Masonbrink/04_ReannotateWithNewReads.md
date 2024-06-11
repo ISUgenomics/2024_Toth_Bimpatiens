@@ -168,7 +168,7 @@ ls -lrth *out.bam |awk '$5!="0"{print $9}' >bam.list
 ml samtools; samtools merge -@ 24  -b bam.list MergedRNA.bam ;samtools sort -o MergedRNA_sorted.bam -T TEMP  --threads 24   MergedRNA.bam
 
 # run filter to get rid of low quality mapping, unmapped reads, and non-primary alignments
-ml samtools;samtools view -b -F 260  -q 20 MergedLongDistRNA_sorted.bam > HQMergedLongDistRNA_sorted.bam; samtools index HQMergedLongDistRNA_sorted.bam
+ml samtools; samtools index MergedRNA_sorted.bam ;samtools view -b -F 260  -q 20 MergedRNA_sorted.bam > HQMergedRNA_sorted.bam; samtools index HQMergedRNA_sorted.bam
 
 ```
 
@@ -182,9 +182,222 @@ cd /work/gif3/masonbrink/Toth/02_Bimpatiens/04_Braker
 ln -s /work/gif4/gif/remkv6/Toth/04_Annotation/01_Bimpatiens/01_Repeatmodeler/SoftmaskedBimpatiensGenome.FINAL.fasta
 cp -rf /work/gif4/gif/remkv6/Toth/04_Annotation/02_Pdominula/03_Braker/Augustus/ .
 cp -rf /work/gif4/gif/remkv6/Toth/04_Annotation/02_Pdominula/03_Braker/bin .
+ln -s ../03_STARAlignment/HQMergedRNA_sorted.bam
+ln -s ../03_STARAlignment/HQMergedRNA_sorted.bam.bai
+
+# braker3 command
+ml samtools; ml bamtools;ml genemark-et/4.38-63ipkx4;ml augustus/3.3.2-py3-openmpi3-gee2bjt; ml braker3;braker.pl --genome=SoftmaskedBimpatiensGenome.FINAL.fasta --softmasking --species=BUSCO_BimpatiensGenome.Busco --bam=HQMergedRNA_sorted.bam  --AUGUSTUS_CONFIG_PATH=/work/gif3/masonbrink/Toth/02_Bimpatiens/04_Braker/Augustus/config/ --overwrite --useexisting --gc_probability= 0.007
+
+
+## braker2 command, testing braker3
+ml samtools; ml bamtools;ml genemark-et/4.38-63ipkx4;ml augustus/3.3.2-py3-openmpi3-gee2bjt; ml braker/2.1.2-py3-openmpi3-75wblif;braker.pl --genome=SoftmaskedBimpatiensGenome.FINAL.fasta --softmasking --species=BUSCO_BimpatiensGenome.Busco --bam=HQMergedRNA_sorted.bam  --AUGUSTUS_CONFIG_PATH=/work/gif3/masonbrink/Toth/02_Bimpatiens/04_Braker/Augustus/config/ --overwrite --useexisting
+
+# convert gtf to gff3
+ml augustus/3.4.0-py310-tcknerw
+ /opt/rit/el9/20230413/app/linux-rhel9-x86_64_v3/gcc-11.2.1/augustus-3.4.0-tcknerwejf7sfdkp43i4sfr5zug5ku2g/scripts/gtf2gff.pl <braker.gtf --out braker.gff3
+```
+Results
+```
+        --------------------------------------------------
+        |Results from dataset eukaryota_odb10             |
+        --------------------------------------------------
+        |C:96.1%[S:70.6%,D:25.5%],F:2.4%,M:1.5%,n:255     |
+        |245    Complete BUSCOs (C)                       |
+        |180    Complete and single-copy BUSCOs (S)       |
+        |65     Complete and duplicated BUSCOs (D)        |
+        |6      Fragmented BUSCOs (F)                     |
+        |4      Missing BUSCOs (M)                        |
+        |255    Total BUSCO groups searched               |
+        --------------------------------------------------
+        --------------------------------------------------
+        |Results from dataset metazoa_odb10               |
+        --------------------------------------------------
+        |C:94.7%[S:64.5%,D:30.2%],F:2.1%,M:3.2%,n:954     |
+        |903    Complete BUSCOs (C)                       |
+        |615    Complete and single-copy BUSCOs (S)       |
+        |288    Complete and duplicated BUSCOs (D)        |
+        |20     Fragmented BUSCOs (F)                     |
+        |31     Missing BUSCOs (M)                        |
+        |954    Total BUSCO groups searched               |
+        --------------------------------------------------
+       --------------------------------------------------
+        |Results from dataset hymenoptera_odb10           |
+        --------------------------------------------------
+        |C:92.0%[S:55.8%,D:36.2%],F:3.1%,M:4.9%,n:5991    |
+        |5512   Complete BUSCOs (C)                       |
+        |3345   Complete and single-copy BUSCOs (S)       |
+        |2167   Complete and duplicated BUSCOs (D)        |
+        |184    Fragmented BUSCOs (F)                     |
+        |295    Missing BUSCOs (M)                        |
+        |5991   Total BUSCO groups searched               |
+        --------------------------------------------------
+
+awk '$3=="gene"' braker.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
+Total:  127,172,056
+Count:  17,129
+Mean:   7,424
+Median: 2,210
+Min:    200
+Max:    402,600
+awk '$3=="transcript"' braker.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
+Total:  198,850,912
+Count:  23,745
+Mean:   8,374
+Median: 2,572
+Min:    200
+Max:    402,600
+awk '$3=="CDS"' braker.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
+Total:  34,137,495
+Count:  155,832
+Mean:   219
+Median: 164
+Min:    2
+Max:    9,214
+
+
+```
+### Braker with modified Augustus parameters for less extrapolation
+```
+/work/gif3/masonbrink/Toth/02_Bimpatiens/05_brakerAugustusMan
+
+ln -s /work/gif4/gif/remkv6/Toth/04_Annotation/01_Bimpatiens/01_Repeatmodeler/SoftmaskedBimpatiensGenome.FINAL.fasta
+cp -rf /work/gif4/gif/remkv6/Toth/04_Annotation/02_Pdominula/03_Braker/Augustus/ .
+cp -rf /work/gif4/gif/remkv6/Toth/04_Annotation/02_Pdominula/03_Braker/bin .
+ln -s ../03_STARAlignment/HQMergedRNA_sorted.bam
+ln -s ../03_STARAlignment/HQMergedRNA_sorted.bam.bai
+
+ml bamtools;ml braker3;braker.pl --genome=SoftmaskedBimpatiensGenome.FINAL.fasta --softmasking --species= B.impatiens1 --bam=HQMergedRNA_sorted.bam  --AUGUSTUS_CONFIG_PATH=/work/gif3/masonbrink/Toth/02_Bimpatiens/05_brakerAugustusMan/Augustus/config --overwrite --gff3 --threads 35 --nocleanup --extrinsic Extrinsic_weights_for_Bimpatiens_gene_prediction_exons_ex1.cfg,Extrinsic_weights_for_B.impatiens_gene_prediction_utrs_ex1_utr.cfg --gc_probability= 0.007
+
+
+   exonpart      10  .995 1  M    1  1e+100  RM  1     1    E 1    1    W 1    1.02     P       1       1
+       exon      100        1  M    1  1e+100  RM  1     1    E 1    1    W 1    1      P       1     1e4
+ intronpart      10          1  M    1  1e+100  RM  1     1    E 1    1    W 1    1     P       1       1
+     intron      1000        1  M    1  1e+100  RM  1     1    E 1  1e6    W 1    1     P       1     100
+    CDSpart      10     1 1  M    1  1e+100  RM  1     1    E 1    1      W 1    1      P       1     1e5
+        CDS      100        1  M    1  1e+100  RM  1     1    E 1    1    W 1    1      P       1       1
+
+# convert gtf to gff3
+ml augustus/3.4.0-py310-tcknerw
+ /opt/rit/el9/20230413/app/linux-rhel9-x86_64_v3/gcc-11.2.1/augustus-3.4.0-tcknerwejf7sfdkp43i4sfr5zug5ku2g/scripts/gtf2gff.pl <braker.gtf --out braker.gff3
 
 
 
+        --------------------------------------------------
+        |Results from dataset eukaryota_odb10             |
+        --------------------------------------------------
+        |C:94.9%[S:73.7%,D:21.2%],F:3.1%,M:2.0%,n:255     |
+        |242    Complete BUSCOs (C)                       |
+        |188    Complete and single-copy BUSCOs (S)       |
+        |54     Complete and duplicated BUSCOs (D)        |
+        |8      Fragmented BUSCOs (F)                     |
+        |5      Missing BUSCOs (M)                        |
+        |255    Total BUSCO groups searched               |
+        --------------------------------------------------
+        --------------------------------------------------
+        |Results from dataset metazoa_odb10               |
+        --------------------------------------------------
+        |C:94.9%[S:70.6%,D:24.3%],F:2.4%,M:2.7%,n:954     |
+        |906    Complete BUSCOs (C)                       |
+        |674    Complete and single-copy BUSCOs (S)       |
+        |232    Complete and duplicated BUSCOs (D)        |
+        |23     Fragmented BUSCOs (F)                     |
+        |25     Missing BUSCOs (M)                        |
+        |954    Total BUSCO groups searched               |
+        --------------------------------------------------
+        --------------------------------------------------
+        |Results from dataset hymenoptera_odb10           |
+        --------------------------------------------------
+        |C:88.5%[S:57.2%,D:31.3%],F:5.7%,M:5.8%,n:5991    |
+        |5306   Complete BUSCOs (C)                       |
+        |3429   Complete and single-copy BUSCOs (S)       |
+        |1877   Complete and duplicated BUSCOs (D)        |
+        |340    Fragmented BUSCOs (F)                     |
+        |345    Missing BUSCOs (M)                        |
+        |5991   Total BUSCO groups searched               |
+        --------------------------------------------------
 
-ml samtools; ml bamtools;ml genemark-et/4.38-63ipkx4;ml augustus/3.3.2-py3-openmpi3-gee2bjt; ml braker/2.1.2-py3-openmpi3-75wblif;braker.pl --genome=SoftmaskedBimpatiensGenome.FINAL.fasta --softmasking --species=BUSCO_BimpatiensGenome.Busco --bam=MergedRNA_sorted.bam  --AUGUSTUS_CONFIG_PATH=/work/gif/remkv6/Toth/04_Annotation/02_Pdominula/03_Braker/Augustus/config/ --overwrite --useexisting
+awk '$3=="gene"' braker.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
+Total:  106,414,721
+Count:  14,480
+Mean:   7,349
+Median: 1,995
+Min:    200
+Max:    433,285
+awk '$3=="transcript"' braker.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
+Total:  174,597,969
+Count:  20,958
+Mean:   8,330
+Median: 2,354
+Min:    200
+Max:    433,285
+awk '$3=="CDS"' braker.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
+Total:  30,235,860
+Count:  134,215
+Mean:   225
+Median: 165
+Min:    2
+Max:    9,818
+
+
+```
+
+
+Old Annotations
+
+Published Honeybee reference stats
+```
+Gene count  12,374
+
+
+Mean  Median  Min Max
+Genes	12,332	15,014	3,614	62	869,734
+All_transcripts	28,117	3,508	2,519	19	76,350
+mRNA	23,458	3,696	2,658	105	76,350
+CDSs	23,471	2,446	1,614	78	75,615
+Exons	100,203	401	213	2	22,508
+
+https://www.ncbi.nlm.nih.gov/genome/annotation_euk/Apis_mellifera/104/
+```
+
+
+B impatiens braker annotation stats from 100bp PE reads aligned with HiSat2
+```
+/work/gif/remkv6/Toth/04_Annotation/01_Bimpatiens/05_AlignHisat/01_braker/braker/BUSCO_BimpatiensGenome.Busco
+
+awk '$3=="gene"' augustus.hints.gff |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
+Total:  116,258,852
+Count:  17,208
+Mean:   6,756
+Median: 2,112
+Min:    200
+Max:    404,864
+
+awk '$3=="transcript"' augustus.hints.gff |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
+Total:  159,919,211
+Count:  19,839
+Mean:   8,060
+Median: 2,475
+Min:    200
+Max:    404,864
+
+awk '$3=="CDS"' augustus.hints.gff |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
+Total:  27,348,700
+Count:  123,003
+Mean:   222
+Median: 165
+Min:    2
+Max:    9,818
+
+
+Hmm. smaller sized and more genes/exons/transcripts than the honeybee assembly. I bet this is due to the 100bp pe reads.
+```
+
+### Create bigwigs of splices to evaluate annotation quality
+
+```
+# Isolate only reads that are spliced. 
+ml samtools ;samtools view -h HQMergedRNA_sorted.bam |awk '\$0 ~ /^@/ || \$6 ~ /N/' | samtools view -b > HQMergedRNASplices_sorted.bam
+# create bigwig
+ml miniconda3;source activate deeptools; bamCoverage -b HQMergedRNASplices_sorted.bam -bs 1 -p 36 -of bigwig -o HQMergedRNAplices_sorted.bw
+
 ```
