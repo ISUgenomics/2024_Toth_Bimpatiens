@@ -186,15 +186,17 @@ ln -s ../03_STARAlignment/HQMergedRNA_sorted.bam
 ln -s ../03_STARAlignment/HQMergedRNA_sorted.bam.bai
 
 # braker3 command
-ml samtools; ml bamtools;ml genemark-et/4.38-63ipkx4;ml augustus/3.3.2-py3-openmpi3-gee2bjt; ml braker3;braker.pl --genome=SoftmaskedBimpatiensGenome.FINAL.fasta --softmasking --species=BUSCO_BimpatiensGenome.Busco --bam=HQMergedRNA_sorted.bam  --AUGUSTUS_CONFIG_PATH=/work/gif3/masonbrink/Toth/02_Bimpatiens/04_Braker/Augustus/config/ --overwrite --useexisting --gc_probability= 0.007
+ml samtools; ml bamtools;ml genemark-et/4.38-63ipkx4;ml augustus/3.3.2-py3-openmpi3-gee2bjt; ml braker3;braker.pl --genome=SoftmaskedBimpatiensGenome.FINAL.fasta --softmasking --species=BUSCO_BimpatiensGenome.Busco --bam=HQMergedRNA_sorted.bam  --AUGUSTUS_CONFIG_PATH=/work/gif3/masonbrink/Toth/02_Bimpatiens/04_Braker/Augustus/config/ --overwrite --useexisting --gc_probability= 0.007 --gff3
 
-
-## braker2 command, testing braker3
-ml samtools; ml bamtools;ml genemark-et/4.38-63ipkx4;ml augustus/3.3.2-py3-openmpi3-gee2bjt; ml braker/2.1.2-py3-openmpi3-75wblif;braker.pl --genome=SoftmaskedBimpatiensGenome.FINAL.fasta --softmasking --species=BUSCO_BimpatiensGenome.Busco --bam=HQMergedRNA_sorted.bam  --AUGUSTUS_CONFIG_PATH=/work/gif3/masonbrink/Toth/02_Bimpatiens/04_Braker/Augustus/config/ --overwrite --useexisting
 
 # convert gtf to gff3
 ml augustus/3.4.0-py310-tcknerw
- /opt/rit/el9/20230413/app/linux-rhel9-x86_64_v3/gcc-11.2.1/augustus-3.4.0-tcknerwejf7sfdkp43i4sfr5zug5ku2g/scripts/gtf2gff.pl <braker.gtf --out braker.gff3
+ /opt/rit/el9/20230413/app/linux-rhel9-x86_64_v3/gcc-11.2.1/augustus-3.4.0-tcknerwejf7sfdkp43i4sfr5zug5ku2g/scripts/gtf2gff.pl <braker.gtf --gff3 --out braker.gff3
+
+ #Create Jbrowse track
+gff3sort.pl --precise --chr_order natural braker.gff3 >SortedbrakerNatural.gff3
+ml tabix; bgzip SortedbrakerNatural.gff3 ; tabix -p gff SortedbrakerNatural.gff3.gz
+
 ```
 Results
 ```
@@ -239,7 +241,7 @@ Mean:   7,424
 Median: 2,210
 Min:    200
 Max:    402,600
-awk '$3=="transcript"' braker.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
+awk '$3=="mRNA"' braker.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
 Total:  198,850,912
 Count:  23,745
 Mean:   8,374
@@ -253,9 +255,8 @@ Mean:   219
 Median: 164
 Min:    2
 Max:    9,214
-
-
 ```
+
 ### Braker with modified Augustus parameters for less extrapolation
 ```
 /work/gif3/masonbrink/Toth/02_Bimpatiens/05_brakerAugustusMan
@@ -278,9 +279,10 @@ ml bamtools;ml braker3;braker.pl --genome=SoftmaskedBimpatiensGenome.FINAL.fasta
 
 # convert gtf to gff3
 ml augustus/3.4.0-py310-tcknerw
- /opt/rit/el9/20230413/app/linux-rhel9-x86_64_v3/gcc-11.2.1/augustus-3.4.0-tcknerwejf7sfdkp43i4sfr5zug5ku2g/scripts/gtf2gff.pl <braker.gtf --out braker.gff3
-
-
+ /opt/rit/el9/20230413/app/linux-rhel9-x86_64_v3/gcc-11.2.1/augustus-3.4.0-tcknerwejf7sfdkp43i4sfr5zug5ku2g/scripts/gtf2gff.pl <braker.gtf --gff3 --out braker.gff3
+#Create Jbrowse track
+gff3sort.pl --precise --chr_order natural braker.gff3 >SortedbrakerAug.gff3
+ml tabix; bgzip SortedbrakerAug.gff3 ; tabix -p gff SortedbrakerAug.gff3.gz
 
         --------------------------------------------------
         |Results from dataset eukaryota_odb10             |
@@ -323,7 +325,7 @@ Mean:   7,349
 Median: 1,995
 Min:    200
 Max:    433,285
-awk '$3=="transcript"' braker.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
+awk '$3=="mRNA"' braker.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
 Total:  174,597,969
 Count:  20,958
 Mean:   8,330
@@ -342,7 +344,7 @@ Max:    9,818
 ```
 
 
-Old Annotations
+### Old Annotations
 
 Published Honeybee reference stats
 ```
@@ -387,9 +389,6 @@ Mean:   222
 Median: 165
 Min:    2
 Max:    9,818
-
-
-Hmm. smaller sized and more genes/exons/transcripts than the honeybee assembly. I bet this is due to the 100bp pe reads.
 ```
 
 ### Create bigwigs of splices to evaluate annotation quality
@@ -399,5 +398,126 @@ Hmm. smaller sized and more genes/exons/transcripts than the honeybee assembly. 
 ml samtools ;samtools view -h HQMergedRNA_sorted.bam |awk '\$0 ~ /^@/ || \$6 ~ /N/' | samtools view -b > HQMergedRNASplices_sorted.bam
 # create bigwig
 ml miniconda3;source activate deeptools; bamCoverage -b HQMergedRNASplices_sorted.bam -bs 1 -p 36 -of bigwig -o HQMergedRNAplices_sorted.bw
+
+
+The augustus extrinsic modified braker was the most accurate via RNAseq alignments.
+```
+
+
+### Grab complete and fragmented BUSCOs from natural braker to add too extrinsic modified braker
+```
+# create list of fragmented, duplicated and complete buscos from natural braker
+/work/gif3/masonbrink/Toth/02_Bimpatiens/04_Braker/braker
+cat brakerNOSTOP_*/run*/full_table.tsv |awk 'substr($1,1,1)!="#"' |awk '$2!="Missing"' >AllBuscosNormalBraker.tsv
+
+#create list of missing from extrinsic modified braker, create list of fragmented from extrinsic modified braker
+/work/gif3/masonbrink/Toth/02_Bimpatiens/05_brakerAugustusMan/braker
+cat brakerNOSTOP1_*/run*/full_table.tsv |awk 'substr($1,1,1)!="#"' |awk '$2=="Missing"' >AllBuscosMissingAugBraker.tsv
+cat brakerNOSTOP1_*/run*/full_table.tsv |awk 'substr($1,1,1)!="#"' |awk '$2=="Fragmented"' >AllBuscosFragmentedAugBraker.tsv
+
+
+#get list of busco genes in the natural braker Missing in extrinsic modified braker
+less AllBuscosMissingAugBraker.tsv |awk '{print $1}' |sort|uniq|grep -w -f - ../../04_Braker/braker/AllBuscosNormalBraker.tsv |sort -k1,1 -u |cut -f 3 >BUSCOGenesMissingFromNatural.list
+
+#get list of busco genes in the natural braker Fragmented in extrinsic modified braker
+less AllBuscosFragmentedAugBraker.tsv |cut -f 1 |grep -w -f - ../../04_Braker/braker/AllBuscosNormalBraker.tsv |awk '$2=="Complete" ||$2=="Duplicated"' |sort -k1,1 -u |cut -f 3 >BUSCOGenesNotFragmentedFromNatural.list
+
+cat BUSCOGenes* |sed 's/\./\t/g' |cut -f 1 >Genes2Add.list
+
+# gets those genes by name, though mikado does not deal with introns so every gene's introns are here too. 
+ml miniconda3; source activate cufflinks; mikado util grep --genes Genes2Add.list ../../04_Braker/braker/braker.gff3 Genes2Add.gff3
+
+#manual removal of introns
+ grep -f Genes2Add.list Genes2Add.gff3 >Genes2Add4Modification.gff3
+ vi Genes2Add4Modification.gff3
+
+less Genes2Add4Modification.gff3 |sed 's/=/=N/g' |cat - braker.gff3 >Combinedbraker.gff3
+
+#rename genes and mrnas
+awk '$3=="gene"' Combinedbraker.gff3 |sort -k1,1V -k4,5nr |sed 's/ID=//g' |cut -f 9 | awk '{print $1"\tBimp_"NR}' |sed 's/;//g' >OldGeneNamesr2NewGeneNames.map
+awk '$3=="mRNA"' Combinedbraker.gff3 |sort -k1,1V -k4,5nr |sed 's/ID=//g' |sed 's/;/\t/g' |cut -f 9 | awk '{print $1"\tBimpmRNA_"NR}'  >OldmRNANamesr2NewmRNANames.map
+
+ml maker; singularity shell "/opt/rit/singularity/images/maker/2.31.10_3.1/maker.simg"
+map_gff_ids OldGeneNamesr2NewGeneNames.map Combinedbraker.gff3
+map_gff_ids OldmRNANamesr2NewmRNANames.map Combinedbraker.gff3
+
+
+#merge the transcripts with cufflinks and create protein/transcript files
+gffread  Combinedbraker.gff3 -g ../SoftmaskedBimpatiensGenome.FINAL.fasta  -o Bimp_Annotation.gff3 -y Bimp_Proteins.fasta -x Bimp_Transcripts.fasta -M
+
+#convert locus to gene
+less Bimp_Annotation.gff3 |sed 's/locus=RLOC.*;t*/t/g' |sed 's/locus/gene/g' |sed 's/RLOC/Bimp/g' >FinalBimpAnnotation.gff3
+```
+
+
+### Final Evaluation
+BUSCO
+```
+sed 's/\.//g' Bimp_Proteins.fasta >BimpNOSTOPproteins.fasta
+echo "sh ~/common_scripts/runBuscoProteinsToth.sh BimpNOSTOPproteins.fasta " >buscoCombined.sh
+
+        --------------------------------------------------
+        |Results from dataset eukaryota_odb10             |
+        --------------------------------------------------
+        |C:96.1%[S:73.7%,D:22.4%],F:2.4%,M:1.5%,n:255     |
+        |245    Complete BUSCOs (C)                       |
+        |188    Complete and single-copy BUSCOs (S)       |
+        |57     Complete and duplicated BUSCOs (D)        |
+        |6      Fragmented BUSCOs (F)                     |
+        |4      Missing BUSCOs (M)                        |
+        |255    Total BUSCO groups searched               |
+        --------------------------------------------------
+        --------------------------------------------------
+        |Results from dataset metazoa_odb10               |
+        --------------------------------------------------
+        |C:96.3%[S:71.2%,D:25.1%],F:1.6%,M:2.1%,n:954     |
+        |918    Complete BUSCOs (C)                       |
+        |679    Complete and single-copy BUSCOs (S)       |
+        |239    Complete and duplicated BUSCOs (D)        |
+        |15     Fragmented BUSCOs (F)                     |
+        |21     Missing BUSCOs (M)                        |
+        |954    Total BUSCO groups searched               |
+        --------------------------------------------------
+        --------------------------------------------------
+        |Results from dataset hymenoptera_odb10           |
+        --------------------------------------------------
+        |C:93.6%[S:61.0%,D:32.6%],F:2.9%,M:3.5%,n:5991    |
+        |5607   Complete BUSCOs (C)                       |
+        |3653   Complete and single-copy BUSCOs (S)       |
+        |1954   Complete and duplicated BUSCOs (D)        |
+        |173    Fragmented BUSCOs (F)                     |
+        |211    Missing BUSCOs (M)                        |
+        |5991   Total BUSCO groups searched               |
+        --------------------------------------------------
+
+
+```
+Annotation Stats
+```
+awk '$3=="gene"' FinalBimpAnnotation.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
+awk '$3=="mRNA"' FinalBimpAnnotation.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
+awk '$3=="CDS"' FinalBimpAnnotation.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
+
+awk '$3=="gene"' FinalBimpAnnotation.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
+Total:  106,795,928
+Count:  14,004
+Mean:   7,626
+Median: 2,065
+Min:    115
+Max:    433,285
+awk '$3=="mRNA"' FinalBimpAnnotation.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
+Total:  181,541,756
+Count:  21,127
+Mean:   8,592
+Median: 2,418
+Min:    115
+Max:    433,285
+awk '$3=="CDS"' FinalBimpAnnotation.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
+Total:  31,263,898
+Count:  138,723
+Mean:   225
+Median: 165
+Min:    2
+Max:    9,818
 
 ```
