@@ -98,27 +98,28 @@ gffread  ../../05_brakerAugustusMan/braker/FinalBimpAnnotation.gff3 MergedGenome
 
 Results
 ```
-awk '$3=="locus"' Bimp_NCBIAnnotationMergedBraker.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
+awk '$3=="locus"' SortedFunctionalAnnotationBimpatiens.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
 Total:  119,328,257
 Count:  13,938
 Mean:   8,561
 Median: 2,126
 Min:    115
 Max:    435,723
-awk '$3=="mRNA"' Bimp_NCBIAnnotationMergedBraker.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
+awk '$3=="mRNA"' SortedFunctionalAnnotationBimpatiens.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
 Total:  379,412,063
 Count:  35,653
 Mean:   10,641
 Median: 2,895
 Min:    115
 Max:    435,720
-awk '$3=="CDS"' Bimp_NCBIAnnotationMergedBraker.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
+ awk '$3=="CDS"' SortedFunctionalAnnotationBimpatiens.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
 Total:  58,591,639
 Count:  250,596
 Mean:   233
 Median: 170
 Min:    0
 Max:    11,628
+
 
 
         --------------------------------------------------
@@ -157,3 +158,22 @@ Max:    11,628
         |5991   Total BUSCO groups searched               |
         --------------------------------------------------
 ```
+
+
+### Rename genes and mRNAs
+```
+less Bimp_NCBIAnnotationMergedBraker.gff3|sed 's/locus=/gene=/g' |cut -f 1-9 |sed 's/genes=/\t/g' |cut -f 1-9 |sed 's/geneID.*gene=/Parent=/g' |sed 's/transcripts=.*//g' |sed 's/locus/gene/g' |sed 's/gene=.*//g' |sed 's/gffcl/AUGUSTUS/g' >CleanAnnotation4Renaming.gff3
+
+
+ awk '$3=="mRNA" {print $9}' CleanAnnotation4Renaming.gff3 |sed 's/ID=//g' |sed 's/;/\t/g' |awk '{print $1"\tBimpmRNA"NR}'  >mrna.map
+ awk '$3=="gene" {print $9}' CleanAnnotation4Renaming.gff3 |sed 's/ID=//g' |sed 's/;/\t/g' |awk '{print $1"\tBimpGene"substr($1,5,length($1))}' >gene.map
+
+ml maker; singularity shell "/opt/rit/singularity/images/maker/2.31.10_3.1/maker.simg"
+map_gff_ids mrna.map CleanAnnotation4Renaming.gff3
+map_gff_ids gene.map CleanAnnotation4Renaming.gff3
+
+gffread -g SoftmaskedBimpatiensGenome.FINAL.fasta BimpGeneAnnotation.gff3 -x Bimp_transcripts.fasta -y Bimp_proteins.fasta
+
+```
+
+

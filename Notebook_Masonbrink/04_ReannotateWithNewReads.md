@@ -498,21 +498,21 @@ awk '$3=="gene"' FinalBimpAnnotation.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{
 awk '$3=="mRNA"' FinalBimpAnnotation.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
 awk '$3=="CDS"' FinalBimpAnnotation.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
 
-awk '$3=="gene"' FinalBimpAnnotation.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
+awk '$3=="gene"' SortedFunctionalAnnotationBimpatiens.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
 Total:  106,795,928
-Count:  14,004
+Count:  14,011
 Mean:   7,626
 Median: 2,065
 Min:    115
 Max:    433,285
-awk '$3=="mRNA"' FinalBimpAnnotation.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
+awk '$3=="mRNA"' SortedFunctionalAnnotationBimpatiens.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
 Total:  181,541,756
 Count:  21,127
 Mean:   8,592
 Median: 2,418
 Min:    115
 Max:    433,285
-awk '$3=="CDS"' FinalBimpAnnotation.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
+awk '$3=="CDS"' SortedFunctionalAnnotationBimpatiens.gff3 |awk 'substr($1,1,5)=="HiC_s"' |awk '{if($5>$4) {print $5-$4} else {print $4-$5}}' |summary.sh
 Total:  31,263,898
 Count:  138,723
 Mean:   225
@@ -521,3 +521,4 @@ Min:    2
 Max:    9,818
 
 ```
+
