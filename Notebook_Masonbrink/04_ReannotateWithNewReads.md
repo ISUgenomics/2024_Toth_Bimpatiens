@@ -1,5 +1,6 @@
 # Reannotate Bombus impatiens with new RNAseq reads using braker
 
+This was a two braker run job on the same data alignments, choosing the best genes and combining the remaining. The gene stats at the bottom are not the final annotation stats, as we later found the NCBI gene annotation for Bimp 2.2.  This annotation was integrated with these two braker runs in 05_AlignNCBIAnnotation.md. 
 ### Download RNAseq reads from NCBI SRA with at least 150bp in length
 ```
 SRR15927739 - SRR15927792
@@ -159,8 +160,18 @@ SRR26132679Log.final.out:                        Uniquely mapped reads % |      
 
 This set of reads timed out running and were not used for annotation SRR19756301.
 
+##### Depth of Coverage
+```
+grep "Number of input reads"  *Log.final.out |awk '{print $7}' |summary.sh
+Total:  3,038,012,720
+Count:  115
 
+#if rnaseq cov were assessed like a genome
+ (3,038,012,720 * 150bp)/ 266,606,045 =17,09x
 
+#the more reasonable metric using total expressed bp in the genome (CDS).
+(3,038,012,720 * 150)bp/ 31,263,898 = 14,575x
+```
 
 ### Merge RNAseq bam files for braker
 ```
@@ -169,11 +180,7 @@ ml samtools; samtools merge -@ 24  -b bam.list MergedRNA.bam ;samtools sort -o M
 
 # run filter to get rid of low quality mapping, unmapped reads, and non-primary alignments
 ml samtools; samtools index MergedRNA_sorted.bam ;samtools view -b -F 260  -q 20 MergedRNA_sorted.bam > HQMergedRNA_sorted.bam; samtools index HQMergedRNA_sorted.bam
-
 ```
-
-
-
 
 ### Braker
 ```
@@ -522,3 +529,7 @@ Max:    9,818
 
 ```
 
+### Summary
+```
+This gene annotation is a massive improvement over the initial one in 03_InitialGeneAnnotation.   approximately 3,000 fewer genes, which were likely fragmented models, are down to ~14,000 which is similar to Bimp2.2 BUSCO genes also increased quite a bit, though still not as high as what is found in Bimp2.2 
+```

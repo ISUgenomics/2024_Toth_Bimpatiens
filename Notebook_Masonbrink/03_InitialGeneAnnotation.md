@@ -1,6 +1,7 @@
 
 # Annotate the Bombus impatiens genome!
 
+This was an initial attempt at annotating the B. impatiens genome using 100bp PE RNAseq reads. Pretty much everything here can be ignored excluding the repeats analysis. Btter reads became available prior to the publication of this genome, so we needed to update the annotation in 04_ReannotateWithNewReads.md
 ### Download RNAseq
 ```
 /work/gif/remkv6/Toth/04_Annotation/01_Bimpatiens
@@ -29,11 +30,77 @@ ml miniconda3; source activate repeatmodeler2;
 BuildDatabase -name impatiens BimpatiensGenome.FINAL.fasta
 ml miniconda3; source activate repeatmodeler2; RepeatModeler -database impatiens -pa 36
 
-ln -s RM_31387.ThuSep91628542021/consensi.fa
+
+
+ln -s /work/gif4/gif/remkv6/Toth/04_Annotation/01_Bimpatiens/01_Repeatmodeler/RM_31387.ThuSep91628542021/consensi.fa.classified
 
 ml miniconda3; source activate repeatmasker; RepeatMasker -pa 36 -norna  -dir RepeatmaskerOut -small -gff -lib consensi.fa BimpatiensGenome.FINAL.fasta
 ```
-### Align the RNA
+Results
+```
+==================================================
+file name: BimpatiensGenome.FINAL.fasta
+sequences:           210
+total length:  266606045 bp  (266287284 bp excl N/X-runs)
+GC level:         37.44 %
+bases masked:   56536941 bp ( 21.21 %)
+==================================================
+               number of      length   percentage
+               elements*    occupied  of sequence
+--------------------------------------------------
+Retroelements        19208     14934750 bp    5.60 %
+   SINEs:                0            0 bp    0.00 %
+   Penelope              0            0 bp    0.00 %
+   LINEs:             8490      6033403 bp    2.26 %
+    CRE/SLACS            0            0 bp    0.00 %
+     L2/CR1/Rex        285        75841 bp    0.03 %
+     R1/LOA/Jockey    2677      1700468 bp    0.64 %
+     R2/R4/NeSL        257       453758 bp    0.17 %
+     RTE/Bov-B         475       292825 bp    0.11 %
+     L1/CIN4           110        68253 bp    0.03 %
+   LTR elements:     10718      8901347 bp    3.34 %
+     BEL/Pao          3422      1733717 bp    0.65 %
+     Ty1/Copia         881       732789 bp    0.27 %
+     Gypsy/DIRS1      5619      6315652 bp    2.37 %
+       Retroviral      203        12161 bp    0.00 %
+
+DNA transposons      12728      3074277 bp    1.15 %
+   hobo-Activator     1048       315203 bp    0.12 %
+   Tc1-IS630-Pogo     7455      1683366 bp    0.63 %
+   En-Spm                0            0 bp    0.00 %
+   MuDR-IS905            0            0 bp    0.00 %
+   PiggyBac           2072       740702 bp    0.28 %
+   Tourist/Harbinger   109        25334 bp    0.01 %
+   Other (Mirage,        0            0 bp    0.00 %
+    P-element, Transib)
+
+Rolling-circles        239        82433 bp    0.03 %
+
+Unclassified:       137962     33197315 bp   12.45 %
+
+Total interspersed repeats:    51206342 bp   19.21 %
+
+
+Small RNA:               0            0 bp    0.00 %
+
+Satellites:              0            0 bp    0.00 %
+Simple repeats:      86408      4229641 bp    1.59 %
+Low complexity:      19172      1018525 bp    0.38 %
+==================================================
+
+* most repeats fragmented by insertions or deletions
+  have been counted as one element
+
+
+RepeatMasker version 4.1.2-p1 , default mode
+
+run with rmblastn version 2.10.0+
+The query was compared to classified sequences in "consensi.fa.classified"
+FamDB:
+```
+
+
+
 
 
 ##### Align with Star

@@ -1,5 +1,7 @@
 # Assess datasets and putative pipeline
 
+This is to extract and assess Hic fastq reads from Dovetail.  The reads were of high quality. 
+
 ```
 #data location
 /work/LAS/amytoth-lab/Dovetail_data_2021

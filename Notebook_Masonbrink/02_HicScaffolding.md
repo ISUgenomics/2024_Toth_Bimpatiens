@@ -38,6 +38,8 @@ module load miniconda3/4.3.30-qdauveb;source activate 3d-dna;module load jdk;mod
 
 
 ### Results of 3DDNA runs
+This is essentially a comparison of the scaffolding capabilities of 3ddna without manual intervention (prior to juicebox).  The final assembly is not listed directly below.
+
 ```
 #Input
 ---------------- Information for assembly 'BimpatiensGenome.fa' ----------------
@@ -71,7 +73,7 @@ module load miniconda3/4.3.30-qdauveb;source activate 3d-dna;module load jdk;mod
                                 Average number of contigs per scaffold        1.2
           Average length of break (>25 Ns) between contigs in scaffold        100
 
-#Default 3ddna
+#Default 3ddna -- not used
 ---------------- Information for assembly 'BimpatiensGenome.FINAL.fasta' ----------------
 
 
@@ -104,7 +106,7 @@ Average number of contigs per scaffold        1.3
 Average length of break (>25 Ns) between contigs in scaffold        289
 
 
-### Rep cov 20 3ddna assembly
+### Rep cov 20 3ddna assembly -- not used
 ---------------- Information for assembly 'BimpatiensGenome.FINAL.fasta' ----------------
 
 
@@ -135,16 +137,17 @@ Average length of break (>25 Ns) between contigs in scaffold        289
               Percentage of assembly in unscaffolded contigs       5.6%
                       Average number of contigs per scaffold        1.4
 Average length of break (>25 Ns) between contigs in scaffold        309
+
 ```
 
 
 
 
-### After manual intervention with Juicebox
+### After manual intervention with Juicebox -- THe final genome stats are below
 Used the initial scaffolding without breaking any contigs in 3ddna. 
 ```
-
 /work/gif/remkv6/Toth/02_Juicer/01_Bombus_impatiens/01_Juicer/3ddna/04_3d-dnaDiploidRepCovFinalize
+
 #uploaded from laptop
 BimpatiensGenome.0.review.assembly
 ln -s ../../references/BimpatiensGenome.fa
@@ -240,3 +243,6 @@ Average length of break (>25 Ns) between contigs in scaffold        422
 |5991   Total BUSCO groups searched               |
 --------------------------------------------------
 ```
+
+### Summary 
+We reduced the number of contigs/scaffolds from 786 to 210. L90 went from 19 to 16, essentially completing the expected n=18 pseudomolecules.   

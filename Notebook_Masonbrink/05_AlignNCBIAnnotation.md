@@ -1,5 +1,6 @@
 # Merge braker annotation with alignments of BIMP_2.2 minprot alignments
 
+This code was how we evaluated the Bimp2.2 annotation and integrated it with the final combined braker annotation in 04_ReannotateWithNewReads.md Resulted in a marginal improvement, but a larger than biological representation of mRNAs. 
 
 ### Obtain data
 ```
@@ -15,27 +16,6 @@ https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000188095.3/
 /work/gif3/masonbrink/Toth/02_Bimpatiens/06_AddNCBIAnnotations
 
 echo "ml miniconda3;source activate miniprot; miniprot -N 1 -t 36 -gff SoftmaskedBimpatiensGenome.FINAL.fasta protein.faa" >miniprot.sh
-
-
-```
-
-### Genomethreader
-```
-/work/gif3/masonbrink/Toth/02_Bimpatiens/06_AddNCBIAnnotations/01_Genomethreader
-ln -s ../SoftmaskedBimpatiensGenome.FINAL.fasta
-fasta-splitter.pl --n-parts 99 ../protein.faa
-
-#since I split the protein file up, I make directories named by each protein file, change to that directory, softlink the genome and proteins, then run the gth script.
-for f in *part*faa; do echo "mkdir "$f"dir; cd "$f"dir; ln -s ../SoftmaskedBimpatiensGenome.FINAL.fasta; ln -s ../"$f" ; ml miniconda3; source activate genomethreader;gth -genomic SoftmaskedBimpatiensGenome.FINAL.fasta -protein "$f" -gff3out -o "${f%.*}".aln -force -skipalignmentout";done  >gth.sh
-
-
-
-#formatting after alignment
-gt gff3 -tidy -sort */*aln >genomethreader.gff3
-gt merge genomethreader.gff3 >MergedGenomethreader.gff3
-
- gffread  MergedGenomethreader.gff3 -g SoftmaskedBimpatiensGenome.FINAL.fasta  -o Bimp_NCBIAnnotation.gff3 -y Bimp_NCBIProteins.fasta -x Bimp_NCBITranscripts.fasta
-
 ```
 Results
 ```
@@ -177,3 +157,7 @@ gffread -g SoftmaskedBimpatiensGenome.FINAL.fasta BimpGeneAnnotation.gff3 -x Bim
 ```
 
 
+### Summary
+```
+The protein alignments via miniprot of BIMP2.2 achieved another increase in stats for BUSCO, and a few ~20 more fragmented genes were likley fixed. We used cufflinks gffread to combine these two annotations. Due to differences in prediction methods between Braker and NCBI's annotation pipeline, the transcript models were just enough different to not allow their duplicate mRNA to be removed. 31k mRNA models is much higher than it should be biologically, but it allows the user to choose which transcript best represents their gene of interest. The real biological number is probably closer to 21,127 mRNAs that were found in 04_ReannotateWithNewReads.md.
+```

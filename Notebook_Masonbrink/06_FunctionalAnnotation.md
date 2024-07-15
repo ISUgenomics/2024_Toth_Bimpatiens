@@ -1,6 +1,5 @@
 # Add functional annotation information to gff for B impatiens
-
-# Add functional annotations to gff
+Here we used Diamond to blast the predicted proteins to the NCBI nr and SWISSPROT databases. All of this information has been integrated into the gff.
 
 ### Swissprot
 ```
@@ -60,10 +59,26 @@ wc CombinedNRandSPAnnotations.tab
 
 #what percentages of the proteins have a functional annotation?
 33412/35653 = 93.7%
+BIMP2.2 functional annotation percent = 81.9%
+
+
 
 #how many transposon associated transcripts?
  grep -i -e "transposase" -e "transcriptase" -e "retroelement" -e "helitron" -e "reverse" -e "helitron" -e "transposon"  CombinedNRandSPAnnotations.tab |wc
     204    2426   29118
+
+
+# How many functional annotations are present in Bimp2.2?
+#total with an annotation that was not "uncharacterized"
+less protein.faa |grep ">" |grep -v "uncharacterized" |wc
+  20051  163841 1541830
+#total
+less protein.faa |grep ">"  |wc
+  24471  195496 1888809
+
+
+
+
 
 ```
 
@@ -84,4 +99,8 @@ ml tabix
 bgzip SortedFunctionalAnnotationBimpatiens.gff3
 tabix -p gff SortedFunctionalAnnotationBimpatiens.gff3.gz
 
+```
+### Summary
+```
+There seems to be a massive increase in the percentage of mRNAs that are being annotated.  This could be due to the increased number of mRNA models to an extent, though you would expect unannotated genes to increase at a similar rate. Still 82% to 94% is quite a large jump in functionally annotated genes. 
 ```
