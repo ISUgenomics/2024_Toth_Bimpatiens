@@ -74,8 +74,11 @@ If so then run kill on those commands
 i.e. taskkill /PID 22560 /F
 i.e. C:\Users\remkv> taskkill /PID 27488 /F
 ```
-
+### Results
+This is after removing the top 18 largest scaffolds. 
 ![Blobtools Blob plot](https://github.com/ISUgenomics/2024_Toth_Bimpatiens/blob/main/Assets/Bimpatiens.blob.circle.png)
+
+all scaffolds present
 ![Blobtools Blob plot](https://github.com/ISUgenomics/2024_Toth_Bimpatiens/blob/main/Assets/Bimpatiens.snail.png)
 
 
