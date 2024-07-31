@@ -156,6 +156,12 @@ gffread -g SoftmaskedBimpatiensGenome.FINAL.fasta BimpGeneAnnotation.gff3 -x Bim
 
 ```
 
+### Create conversion of new IDs to Bimp2.2 IDs
+```
+bedtools intersect -wo -a <(awk '$3=="mRNA"'  SortedFunctionalAnnotationBimpatiens.gff3) -b <(awk '$3=="mRNA"' ../06_AddNCBIAnnotations/01_Genomethreader/MergedGenomethreader.gff3 )  |cut -f 9,18 |sed 's/Target=/\t/g' |sed 's/Parent=/\t/1' |cut -f 1,4 |sed 's/ID=//g' |sed 's/;//g' |sort -k1,1 -u |sort -k1,1V |awk '{print $1,$2,$5,$8,$11,$14,$17,$21,$24,$27,$30 }' |sed 's/ +//g' >Bimp3_0toBimp2_2.tab
+```
+
+
 
 ### Summary
 ```
