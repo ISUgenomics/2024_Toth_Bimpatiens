@@ -49,3 +49,11 @@ Where input was just out Bombus impatien genome. "go_species.txt" was
 
 The output GO hash information is in results/go . The output go file is stored in this repo:
 `data/Bombus_impatiens.GO_format.txt`
+
+## Synteny analysis.
+
+To run the synteny analysis, the following tutorial was completed using the JCVI package (https://github.com/tanghaibao/jcvi/wiki/MCscan-(Python-version), see methods in paper). 
+
+This is outlined in the code for this in bin/synteny.sh in this repository. 
+
+It uses various python commands to process the genomes and their associated annotations in gff format, and performs the MSCanX synteny program along with various visualisation plots to represent the syntenic regions between genomes.
