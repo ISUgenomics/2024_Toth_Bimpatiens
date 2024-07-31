@@ -1,6 +1,21 @@
 # Reannotate Bombus impatiens with new RNAseq reads using braker
 
 This was a two braker run job on the same data alignments, choosing the best genes and combining the remaining. The gene stats at the bottom are not the final annotation stats, as we later found the NCBI gene annotation for Bimp 2.2.  This annotation was integrated with these two braker runs in 05_AlignNCBIAnnotation.md. 
+
+- [Reannotate Bombus impatiens with new RNAseq reads using braker](#reannotate-bombus-impatiens-with-new-rnaseq-reads-using-braker)
+    - [Download RNAseq reads from NCBI SRA with at least 150bp in length](#download-rnaseq-reads-from-ncbi-sra-with-at-least-150bp-in-length)
+    - [fastqc and multiqc](#fastqc-and-multiqc)
+    - [Align RNAseq with star](#align-rnaseq-with-star)
+        - [Depth of Coverage](#depth-of-coverage)
+    - [Merge RNAseq bam files for braker](#merge-rnaseq-bam-files-for-braker)
+    - [Braker](#braker)
+    - [Braker with modified Augustus parameters for less extrapolation](#braker-with-modified-augustus-parameters-for-less-extrapolation)
+    - [Old Annotations](#old-annotations)
+    - [Create bigwigs of splices to evaluate annotation quality](#create-bigwigs-of-splices-to-evaluate-annotation-quality)
+    - [Grab complete and fragmented BUSCOs from natural braker to add too extrinsic modified braker](#grab-complete-and-fragmented-buscos-from-natural-braker-to-add-too-extrinsic-modified-braker)
+    - [Final Evaluation](#final-evaluation)
+    - [Summary](#summary)
+
 ### Download RNAseq reads from NCBI SRA with at least 150bp in length
 ```
 SRR15927739 - SRR15927792

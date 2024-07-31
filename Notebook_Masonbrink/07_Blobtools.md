@@ -2,17 +2,13 @@
 
 # Run Blobtools to create snail plot
 No contamination was found. 
-## Table of Contents
-- [Table of Contents](#table-of-contents)
-  - [Email](#email)
-  - [Setting up the data](#setting-up-the-data)
-  - [Alignment](#alignment)
-    - [Script:`00_Scripts/parallel_bowtie_alignment.sh`](#script00_scriptsparallel_bowtie_alignmentsh)
-    - [Running the script:](#running-the-script)
-  - [Adding colour tags.](#adding-colour-tags)
-    - [Indexing bam files](#indexing-bam-files)
-    - [Data and result files to be shared](#data-and-result-files-to-be-shared)
-
+## Table of Contents- [Run Blobtools to create snail plot](#run-blobtools-to-create-snail-plot)
+- [Run Blobtools to create snail plot](#run-blobtools-to-create-snail-plot)
+  - [Table of Contents- Run Blobtools to create snail plot](#table-of-contents--run-blobtools-to-create-snail-plot)
+    - [Map long reads](#map-long-reads)
+    - [Megablast to NCBI NT](#megablast-to-ncbi-nt)
+    - [Blobtools](#blobtools)
+    - [Results](#results)
 ### Map long reads
 ```
 /work/gif3/masonbrink/Toth/02_Bimpatiens/08_Blobtools
