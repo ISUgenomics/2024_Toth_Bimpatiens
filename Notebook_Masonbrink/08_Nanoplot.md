@@ -12,4 +12,4 @@ Using 5466901 reads with read length N50 of 38124bp and maximum of 316801bp.
 
 ![Histogram Read Length](https://github.com/ISUgenomics/2024_Toth_Bimpatiens/blob/main/Assets/B_impatiens_HistogramReadlength1.png)
 
-![Histogram Read Length Log Transformed](B_impatiens_LogTransformed_HistogramReadlength1.png)
+![Histogram Read Length Log Transformed](https://github.com/ISUgenomics/2024_Toth_Bimpatiens/blob/main/Assets/B_impatiens_LogTransformed_HistogramReadlength1.png)
