@@ -9,6 +9,12 @@ With the following command (e.g. for brain):
 
 `nextflow run main.nf --input /home/ucbtcdr/Scratch/Bombus_rnaseq/rnaseq_brain/rnaseq_run1/sample_sheet-brain.csv --outdir rnaseq_results_brain -profile apptainer,ucl_myriad -resume -bg --gff /home/ucbtcdr/Scratch/Bombus_genome/SortedFunctionalAnnotationBimpatiens.allwithparents.gff --fasta /home/ucbtcdr/Scratch/Bombus_genome/B_impatiensGenome.FINAL.fasta.gz --skip_biotype_qc --skip_markduplicates`
 
+MultiQC reports from the brain and fatbody analysis are stored here:
+
+`.data/multiqc`
+
+Files are gzipped, so to open download the `.html.gz`, then run `gunzip *.html.gz`. Then open them in your web browser. 
+
 ## Differential expression
 
 Using the output from the nf-core rnaseq pipeline, I took "deseq2.dds.RData" output, to use as the input to DESeq2.
