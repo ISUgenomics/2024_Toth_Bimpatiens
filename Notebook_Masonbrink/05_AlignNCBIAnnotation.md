@@ -67,12 +67,19 @@ grep -c ">" ../protein.faa
 
 ```
 
-
+### Run genomethreader
+```
+for f in *part*faa; do echo "mkdir "$f"dir; cd "$f"dir; ln -s ../SoftmaskedBimpatiensGenome.FINAL.fasta; ln -s ../"$f" ; ml miniconda3; source activate genomethreader;gth -genomic SoftmaskedBimpatiensGenome.FINAL.fasta -protein "$f" -gff3out -o "${f%.*}".aln -force -skipalignmentout";done  >gth.sh
+gt gff3 -tidy -sort */*aln >genomethreader.gff3
+gt merge genomethreader.gff3 >MergedGenomethreader.gff3
+```
 
 
 ### Merge protein alignments with merged braker anntoation
 ```
 gffread  ../../05_brakerAugustusMan/braker/FinalBimpAnnotation.gff3 MergedGenomethreader.gff3 -g SoftmaskedBimpatiensGenome.FINAL.fasta  -o Bimp_NCBIAnnotationMergedBraker.gff3 -y Bimp_NCBIProteinsMergedBraker.fasta -x Bimp_NCBITranscriptsMergedBraker.fasta -M
+
+
 ```
 
 
